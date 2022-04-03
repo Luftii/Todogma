@@ -1,23 +1,20 @@
 function setTaskText() {
   // This is the task list
   // document.body.div[1].div.div[2].div[2].main.div.div[2].div.div.ul
-  document.getElementById("task-5731683021-content").innerHTML = "Yeaaa boiiiii";
+
 
 
 }
 
 function decryptTaskComments() {
-
-}
-
-function findCommentsDiv() {
-  var find_comments = document.getElementsByClassName("comments_list_container");
-
-  console.log(find_comments);
+  // console.log("Test");
+  // document.getElementById("comment-3045180690").innerHTML = "Yeaaa boiiiii";
+  // $("#comment-3045180690").closest("div.markdown_content").find("p").innerHTML = "Yeaaaaa boiiiii";
+  // findCommentIDs();
 }
 
 function addEventListeners() {
-  document.getElementById("decryptTaskCommentsButton").addEventListener("click", decryptTaskComments);
+  document.getElementById("decryptProjectCommentsButton").addEventListener("click", decryptTaskComments);
 }
 
 addEventListeners();

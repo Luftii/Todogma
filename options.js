@@ -20,6 +20,7 @@ function showPublicKeyDetails() {
   publicKeyTextArea.value = localStorage.getItem(publicKeysListSelect.value);
 }
 
+// Clears the select element on the HTML page
 function removeOptions() {
   var publicKeysListSelect = document.getElementById("publicKeysList");
 
@@ -60,6 +61,7 @@ function addPrivateKey() {
 
   console.log("Public key saved! private_key " + privateKey);
   addPrivateKeyDisplaySuccessMessage();
+  document.getElementById("addPrivateKeyInput").value = "";
   setTimeout(addPrivateKeyRemoveSuccessMessage, 5000);
 }
 
@@ -75,6 +77,23 @@ function addEventListeners() {
   document.getElementById("submitPublicKeyButton").addEventListener("click", addPublicKey);
   document.getElementById("submitPrivateKeyButton").addEventListener("click", addPrivateKey);
   document.getElementById("publicKeysList").addEventListener("change", showPublicKeyDetails);
+
+  chrome.runtime.onMessage.addListener(
+    function (request, sender, sendResponse) {
+      if (request.action === "get_public_key_list_from_options") {
+        let keysLocalStorage = Object.keys(localStorage);
+        var publicKeys = []
+
+        for (var key of keysLocalStorage) {
+          if (key !== "private_key") {
+            publicKeys.push(localStorage.getItem(key));
+          }
+        }
+
+        sendResponse({public_keys: keyList});
+      }
+    }
+  );
 }
 
 addEventListeners();
