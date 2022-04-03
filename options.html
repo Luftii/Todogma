@@ -1,14 +1,49 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <link rel="stylesheet" href="button.css">
+    <link rel="stylesheet" href="options.css">
   </head>
   <body>
-    <div id="buttonDiv">
-    </div>
-    <div>
-      <p>Choose a different background color!</p>
-    </div>
+    <h1>Public keys in local storage</h1>
+
+    <table>
+      <tr>
+        <td>
+          <select name="publicKeysList" size="10" id="publicKeysList">
+
+          </select>
+        </td>
+        <td>
+          <textarea rows="10" cols="40" id="publicKeyTextArea"></textarea>
+        </td>
+      </tr>
+    </table>
+
+    <h1>Add a public key</h1>
+    <table>
+      <tr>
+        <td class="section_header">Public key:</td><td><textarea rows="5" cols="60" id="addPublicKeyInput"></textarea></td>
+      </tr>
+      <tr>
+        <td class="section_header">Public key identifier:</td><td><input type="text" size="60" id="addPublicKeyIdentifier"/></td>
+      </tr>
+      <tr>
+        <div><td/><td><button id="submitPublicKeyButton">Save public key</button>&nbsp;<div id="addPublicKeyStatusDiv"/></td></div>
+      </tr>
+    </table>
+
+    <h1>Set the private key</h1>
+    <table>
+      <tr>
+        <td class="section_header">Private key:</td><td><textarea rows="5" cols="60" id="addPrivateKeyInput"></textarea></td>
+      </tr>
+      <tr>
+        <td class="section_header">Private key passphrase (optional):</td><td><input type="text" size="60" id="addPublicKeyIdentifier"/></textarea></td>
+      </tr>
+      <tr>
+        <div><td/><td><button id="submitPrivateKeyButton">Save private key</button>&nbsp;<div id="addPrivateKeyStatusDiv"/></td></div>
+      </tr>
+    </table>
   </body>
   <script src="options.js"></script>
 </html>

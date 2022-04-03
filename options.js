@@ -1,46 +1,81 @@
-let page = document.getElementById("buttonDiv");
-let selectedClassName = "current";
-const presetButtonColors = ["#3aa757", "#e8453c", "#f9bb2d", "#4688f1"];
+function listPublicKeys() {
+  let keys = Object.keys(localStorage);
+  var publicKeysListSelect = document.getElementById("publicKeysList");
 
-// Reacts to a button click by marking the selected button and saving
-// the selection
-function handleButtonClick(event) {
-  // Remove styling from the previously selected color
-  let current = event.target.parentElement.querySelector(
-    `.${selectedClassName}`
-  );
-  if (current && current !== event.target) {
-    current.classList.remove(selectedClassName);
-  }
+  removeOptions();
 
-  // Mark the button as selected
-  let color = event.target.dataset.color;
-  event.target.classList.add(selectedClassName);
-  chrome.storage.sync.set({ color });
-}
-
-// Add a button to the page for each supplied color
-function constructOptions(buttonColors) {
-  chrome.storage.sync.get("color", (data) => {
-    let currentColor = data.color;
-    // For each color we were provided…
-    for (let buttonColor of buttonColors) {
-      // …create a button with that color…
-      let button = document.createElement("button");
-      button.dataset.color = buttonColor;
-      button.style.backgroundColor = buttonColor;
-
-      // …mark the currently selected color…
-      if (buttonColor === currentColor) {
-        button.classList.add(selectedClassName);
-      }
-
-      // …and register a listener for when that button is clicked
-      button.addEventListener("click", handleButtonClick);
-      page.appendChild(button);
+  for (let key of keys) {
+    if (key !== "private_key") {
+      var option = document.createElement("option");
+      option.text = key;
+      publicKeysListSelect.add(option);
     }
-  });
+  }
 }
 
-// Initialize the page by constructing the color options
-constructOptions(presetButtonColors);
+function showPublicKeyDetails() {
+  let publicKeysListSelect = document.getElementById("publicKeysList");
+  let publicKeyDetailsTextArea = document.getElementById("publicKeyTextArea");
+
+  publicKeyTextArea.value = localStorage.getItem(publicKeysListSelect.value);
+}
+
+function removeOptions() {
+  var publicKeysListSelect = document.getElementById("publicKeysList");
+
+  var i, L = publicKeysListSelect.options.length - 1;
+   for(i = L; i >= 0; i--) {
+      publicKeysListSelect.remove(i);
+   }
+}
+
+function addPublicKey() {
+  var identifier = document.getElementById("addPublicKeyIdentifier").value;
+  var publicKey = document.getElementById("addPublicKeyInput").value;
+  console.log("Hello is me lufti.");
+
+  localStorage.setItem(identifier, publicKey);
+
+  console.log("Public key saved!" + identifier + " " + publicKey);
+  addPublicKeyDisplaySuccessMessage();
+  listPublicKeys();
+  document.getElementById("addPublicKeyIdentifier").value = "";
+  document.getElementById("addPublicKeyInput").value = "";
+  setTimeout(addPublicKeyRemoveSuccessMessage, 5000);
+}
+
+function addPublicKeyDisplaySuccessMessage() {
+  document.getElementById("addPublicKeyStatusDiv").innerHTML = "Public key has been saved!";
+}
+
+function addPublicKeyRemoveSuccessMessage() {
+  document.getElementById("addPublicKeyStatusDiv").innerHTML = "";
+}
+
+function addPrivateKey() {
+  var privateKey = document.getElementById("addPrivateKeyInput").value;
+  console.log("Hello is me lufti.");
+
+  localStorage.setItem("private_key", privateKey);
+
+  console.log("Public key saved! private_key " + privateKey);
+  addPrivateKeyDisplaySuccessMessage();
+  setTimeout(addPrivateKeyRemoveSuccessMessage, 5000);
+}
+
+function addPrivateKeyDisplaySuccessMessage() {
+  document.getElementById("addPrivateKeyStatusDiv").innerHTML = "Private key has been saved!";
+}
+
+function addPrivateKeyRemoveSuccessMessage() {
+  document.getElementById("addPrivateKeyStatusDiv").innerHTML = "";
+}
+
+function addEventListeners() {
+  document.getElementById("submitPublicKeyButton").addEventListener("click", addPublicKey);
+  document.getElementById("submitPrivateKeyButton").addEventListener("click", addPrivateKey);
+  document.getElementById("publicKeysList").addEventListener("change", showPublicKeyDetails);
+}
+
+addEventListeners();
+listPublicKeys();
