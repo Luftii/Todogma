@@ -73,28 +73,35 @@ function addPrivateKeyRemoveSuccessMessage() {
   document.getElementById("addPrivateKeyStatusDiv").innerHTML = "";
 }
 
+// sends the public keys to the content script in Todoist
+function sendPublicKeys(){
+  let keys = Object.keys(localStorage);
+  var publicKeys = [];
+
+  for (let key of keys) {
+    if (key !== "private_key") {
+      publicKeys.push(key);
+    }
+  }
+
+  console.log("Sending public keys now!");
+
+  chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+    var tab = tabs[0];
+    let keys = Object.keys(localStorage);
+    chrome.tabs.sendMessage(tab.id, {publicKeys: keys}, function handler(response) {
+        // only for debugging
+        console.log(response);
+      });
+    });
+}
+
 function addEventListeners() {
   document.getElementById("submitPublicKeyButton").addEventListener("click", addPublicKey);
   document.getElementById("submitPrivateKeyButton").addEventListener("click", addPrivateKey);
   document.getElementById("publicKeysList").addEventListener("change", showPublicKeyDetails);
-
-  chrome.runtime.onMessage.addListener(
-    function (request, sender, sendResponse) {
-      if (request.action === "get_public_key_list_from_options") {
-        let keysLocalStorage = Object.keys(localStorage);
-        var publicKeys = []
-
-        for (var key of keysLocalStorage) {
-          if (key !== "private_key") {
-            publicKeys.push(localStorage.getItem(key));
-          }
-        }
-
-        sendResponse({public_keys: keyList});
-      }
-    }
-  );
 }
 
 addEventListeners();
 listPublicKeys();
+setTimeout(sendPublicKeys, 5000);

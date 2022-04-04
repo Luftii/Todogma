@@ -25,9 +25,6 @@
       "js": ["injection.js", "dependencies/jquery-3.6.0.js"]
     }
   ],
-  "background": {
-    "service_worker": "background.js"
-  },
   "permissions": ["storage", "activeTab", "scripting", "webNavigation"],
   "options_page": "options.html"
 }
