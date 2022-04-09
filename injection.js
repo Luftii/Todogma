@@ -1,4 +1,5 @@
 console.log("Injected script is running!");
+var projectIDsAndNames = [];
 var commentIDs = [];
 var publicKeys = [];
 
@@ -18,6 +19,19 @@ function findCommentIDs() {
   for (var i = 0; i < commentIDs.length; i++) {
   	console.log(i + ": " + commentIDs[i]);
   }
+}
+
+function findProjectNames() {
+  var projectNames = [];
+  projectNames.length = $("#projects_list").find('li').length;
+
+  $("#projects_list").find('li').each(function(index) {
+    projectNames[index] = [];
+    projectNames[index].push($(this).attr("data-id"));
+    projectNames[index].push($(this).find('a').attr("aria-label").split(",")[0]);
+  });
+
+  console.log(projectNames);
 }
 
 function getPublicKeys() {
@@ -50,9 +64,10 @@ function addEventListeners() {
 function runRegularly() {
   addDecryptButton();
   findCommentIDs();
+  findProjectNames();
   getPublicKeys();
 }
 
 addEventListeners();
-setTimeout(runRegularly, 10000); // Runs once
+setTimeout(runRegularly, 5000); // Runs once
 // setInterval(runRegularly, 10000); // Runs repeatedly

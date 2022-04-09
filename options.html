@@ -1,49 +1,69 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <link rel="stylesheet" href="options.css">
+    <link rel="stylesheet" href="dependencies/jquery-ui-1.13.1/jquery-ui.css"/>
+    <script src="dependencies/jquery-3.6.0.js"></script>
+    <script src="dependencies/jquery-ui-1.13.1/jquery-ui.js"></script>
+    <link rel="stylesheet" href="options.css"/>
   </head>
   <body>
-    <h1>Public keys in local storage</h1>
+    <div id="optionsAccordion">
+      <h1>Share project encryption key</h1>
+      <div>
+        <table>
+          <tr>
+            <th>Recipient</th>
+            <th>Project</th>
+            <th>Shareable project key</th>
+          </tr>
+          <tr>
+            <td>
+              <select name="publicKeysList" size="10" id="publicKeysList">
+            </td>
+            <td>
+              <select name="projectNamesList" size="10" id="projectNamesList">
+            </td>
+            <td>
+              <textarea rows="10" cols="50" id="shareableProjectKey"></textarea>
+            </td>
+          </tr>
+        </table>
+      </div>
+      <h1>Public key details</h1>
+      <div>
+        <textarea rows="10" cols="50" id="publicKeyTextArea"></textarea>
+      </div>
 
-    <table>
-      <tr>
-        <td>
-          <select name="publicKeysList" size="10" id="publicKeysList">
+      <h1>Add a public key</h1>
+      <div>
+        <table>
+          <tr>
+            <td class="section_header">Public key:</td><td><textarea rows="5" cols="60" id="addPublicKeyInput"></textarea></td>
+          </tr>
+          <tr>
+            <td class="section_header">Public key identifier:</td><td><input type="text" size="60" id="addPublicKeyIdentifier"/></td>
+          </tr>
+          <tr>
+            <div><td/><td><button id="submitPublicKeyButton">Save public key</button>&nbsp;<div id="addPublicKeyStatusDiv"/></td></div>
+          </tr>
+        </table>
+      </div>
 
-          </select>
-        </td>
-        <td>
-          <textarea rows="10" cols="40" id="publicKeyTextArea"></textarea>
-        </td>
-      </tr>
-    </table>
-
-    <h1>Add a public key</h1>
-    <table>
-      <tr>
-        <td class="section_header">Public key:</td><td><textarea rows="5" cols="60" id="addPublicKeyInput"></textarea></td>
-      </tr>
-      <tr>
-        <td class="section_header">Public key identifier:</td><td><input type="text" size="60" id="addPublicKeyIdentifier"/></td>
-      </tr>
-      <tr>
-        <div><td/><td><button id="submitPublicKeyButton">Save public key</button>&nbsp;<div id="addPublicKeyStatusDiv"/></td></div>
-      </tr>
-    </table>
-
-    <h1>Set the private key</h1>
-    <table>
-      <tr>
-        <td class="section_header">Private key:</td><td><textarea rows="5" cols="60" id="addPrivateKeyInput"></textarea></td>
-      </tr>
-      <tr>
-        <td class="section_header">Private key passphrase (optional):</td><td><input type="text" size="60" id="addPublicKeyIdentifier"/></textarea></td>
-      </tr>
-      <tr>
-        <div><td/><td><button id="submitPrivateKeyButton">Save private key</button>&nbsp;<div id="addPrivateKeyStatusDiv"/></td></div>
-      </tr>
-    </table>
+      <h1>Set the private key</h1>
+      <div>
+        <table>
+          <tr>
+            <td class="section_header">Private key:</td><td><textarea rows="5" cols="60" id="addPrivateKeyInput"></textarea></td>
+          </tr>
+          <tr>
+            <td class="section_header">Private key passphrase (optional):</td><td><input type="text" size="60" id="addPublicKeyIdentifier"/></textarea></td>
+          </tr>
+          <tr>
+            <div><td/><td><button id="submitPrivateKeyButton">Save private key</button>&nbsp;<div id="addPrivateKeyStatusDiv"/></td></div>
+          </tr>
+        </table>
+      </div>
+    </div>
   </body>
   <script src="options.js"></script>
 </html>

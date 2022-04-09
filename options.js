@@ -6,9 +6,11 @@ function listPublicKeys() {
 
   for (let key of keys) {
     if (key !== "private_key") {
-      var option = document.createElement("option");
-      option.text = key;
-      publicKeysListSelect.add(option);
+      if (key.startsWith("public_key_")) {
+        var option = document.createElement("option");
+        option.text = key;
+        publicKeysListSelect.add(option);
+      }
     }
   }
 }
@@ -31,7 +33,7 @@ function removeOptions() {
 }
 
 function addPublicKey() {
-  var identifier = document.getElementById("addPublicKeyIdentifier").value;
+  var identifier = "public_key_" + document.getElementById("addPublicKeyIdentifier").value;
   var publicKey = document.getElementById("addPublicKeyInput").value;
   console.log("Hello is me lufti.");
 
@@ -96,6 +98,12 @@ function sendPublicKeys(){
     });
 }
 
+function addUIFunctions() {
+  $("#optionsAccordion").accordion({
+    collapsible: true
+  });
+}
+
 function addEventListeners() {
   document.getElementById("submitPublicKeyButton").addEventListener("click", addPublicKey);
   document.getElementById("submitPrivateKeyButton").addEventListener("click", addPrivateKey);
@@ -104,4 +112,5 @@ function addEventListeners() {
 
 addEventListeners();
 listPublicKeys();
+addUIFunctions();
 setTimeout(sendPublicKeys, 5000);
