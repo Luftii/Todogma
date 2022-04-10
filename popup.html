@@ -5,7 +5,21 @@
     <script src="dependencies/jquery-3.6.0.js"></script>
   </head>
   <body>
-    <button id="decryptProjectCommentsButton">Decrypt project comments</button>
+    <table>
+      <tr>
+        <td>
+          <select id="projectKeyList"></select>
+        </td>
+        <td>
+          <input type="text" id="textInput"></input>
+        </td>
+        <td>
+          <button id="encryptDecryptButton">Encrypt/Decrypt</button>
+        </td>
+      </tr>
+    </table>
     <script src="popup.js"></script>
+    <script src="/dependencies/cryptojs-3.1.2/rollups/aes.js"></script>
+    <script src="/dependencies/jquery-3.6.0.js"></script>
   </body>
 </html>

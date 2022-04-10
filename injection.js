@@ -2,11 +2,8 @@ console.log("Injected script is running!");
 var projectIDsAndNames = [];
 var commentIDs = [];
 var publicKeys = [];
-
-function addDecryptButton() {
-  var $input = $('<a href="#" onclick=\"performDecryption()\"><span class="_1f20c88a">Decrypt</span></button>');
-  $input.appendTo($(".comments_textarea_buttons"));
-}
+var port;
+var aes_keys;
 
 function findCommentIDs() {
   commentIDs = [];
@@ -31,41 +28,39 @@ function findProjectNames() {
     projectNames[index].push($(this).find('a').attr("aria-label").split(",")[0]);
   });
 
+  port.postMessage({action: "sendProjectIDsAndNames", data: projectNames});
+
   console.log(projectNames);
 }
 
-function getPublicKeys() {
-  // The following opens a channel for long-lived communication (see: https://developer.chrome.com/docs/extensions/mv3/messaging/)
-
-  // // Get public keys from local extension storage
-  // chrome.runtime.sendMessage({action: "get_public_key_list"}, function(response) {
-  //   console.log(response.public_keys);
-  // });
+function getProjectKeys() {
+  port.postMessage({action: "getProjectKeys"});
 }
 
-function performDecryption() {
-  console.log("Hello is me decryptor");
-  // Try to decrypt every comment
+function performDecryption(text, key) {
+  return "[DEC] " + CryptoJS.AES.decrypt(text, key).toString(CryptoJS.enc.Utf8);
 }
 
 function addEventListeners() {
-  chrome.runtime.onConnect.addListener(function(port) {
-    port.onMessage.addListener(function(msg) {
-      console.log(msg);
-    });
-  });
+  port = chrome.runtime.connect({name:"port-from-cs"});
 
-  chrome.runtime.onMessage.addListener(
-    function(request, sender, sendResponse) {
-      console.log(msg);
+  port.onMessage.addListener(function(m) {
+    console.log(m.action + ": " + m.data);
+    if (m.action === "getProjectKeysAnswer") {
+      aes_keys = m.data;
+
+      $(".comments_list_container").find('div[id^="comment"]').each(function(index) {
+      	console.log($(this).attr("id"));
+        $(this).find('p').text(performDecryption($(this).find('p').text(), aes_keys[0][2]));
+      });
+    }
   });
 }
 
 function runRegularly() {
-  addDecryptButton();
   findCommentIDs();
   findProjectNames();
-  getPublicKeys();
+  getProjectKeys();
 }
 
 addEventListeners();

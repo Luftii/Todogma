@@ -1,8 +1,11 @@
+let port;
+let projectNames = [];
+
 function listPublicKeys() {
   let keys = Object.keys(localStorage);
   var publicKeysListSelect = document.getElementById("publicKeysList");
 
-  removeOptions();
+  removeOptions("publicKeysList");
 
   for (let key of keys) {
     if (key !== "private_key") {
@@ -23,12 +26,12 @@ function showPublicKeyDetails() {
 }
 
 // Clears the select element on the HTML page
-function removeOptions() {
-  var publicKeysListSelect = document.getElementById("publicKeysList");
+function removeOptions(selectID) {
+  var selectToClear = document.getElementById(selectID);
 
-  var i, L = publicKeysListSelect.options.length - 1;
+  var i, L = selectToClear.options.length - 1;
    for(i = L; i >= 0; i--) {
-      publicKeysListSelect.remove(i);
+      selectToClear.remove(i);
    }
 }
 
@@ -55,23 +58,28 @@ function addPublicKeyRemoveSuccessMessage() {
   document.getElementById("addPublicKeyStatusDiv").innerHTML = "";
 }
 
-function addPrivateKey() {
-  var privateKey = document.getElementById("addPrivateKeyInput").value;
-  console.log("Hello is me lufti.");
+function generateKeypair() {
+  var keySize = 4096;
+  var crypt = new JSEncrypt({default_key_size: keySize});
 
-  localStorage.setItem("private_key", privateKey);
+  crypt.getKey();
 
-  console.log("Public key saved! private_key " + privateKey);
-  addPrivateKeyDisplaySuccessMessage();
-  document.getElementById("addPrivateKeyInput").value = "";
-  setTimeout(addPrivateKeyRemoveSuccessMessage, 5000);
+  localStorage.setItem("private_key", crypt.getPrivateKey());
+
+  localStorage.setItem("public_key_me", crypt.getPublicKey());
+
+  document.getElementById("generatedPublicKeyTextarea").value = localStorage.getItem("public_key_me");
+
+  generateKeypairStatusDivSuccessMessage();
+  listPublicKeys();
+  setTimeout(generateKeypairStatusDivRemoveSuccessMessage, 5000);
 }
 
-function addPrivateKeyDisplaySuccessMessage() {
-  document.getElementById("addPrivateKeyStatusDiv").innerHTML = "Private key has been saved!";
+function generateKeypairStatusDivSuccessMessage() {
+  document.getElementById("generateKeypairStatusDiv").innerHTML = "Private key has been saved!";
 }
 
-function addPrivateKeyRemoveSuccessMessage() {
+function generateKeypairStatusDivRemoveSuccessMessage() {
   document.getElementById("addPrivateKeyStatusDiv").innerHTML = "";
 }
 
@@ -87,15 +95,31 @@ function sendPublicKeys(){
   }
 
   console.log("Sending public keys now!");
+}
 
-  chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-    var tab = tabs[0];
-    let keys = Object.keys(localStorage);
-    chrome.tabs.sendMessage(tab.id, {publicKeys: keys}, function handler(response) {
-        // only for debugging
-        console.log(response);
-      });
-    });
+function generateProjectEncryptionKey() {
+  let randomKey = "";
+  let chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+
+  for (let i = 0; i < 32; i++) {
+    randomKey += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+
+  document.getElementById("projectEncryptionKeyInput").value = randomKey;
+}
+
+function saveProjectEncryptionKey() {
+  let projectNamesListSelect = document.getElementById("projectNamesList");
+  let projectEncryptionKeyInput = document.getElementById("projectEncryptionKeyInput");
+
+  // Get selected option id and name
+  let selectionID = projectNamesListSelect.options[projectNamesListSelect.selectedIndex].id;
+  let selectionText = projectNamesListSelect.options[projectNamesListSelect.selectedIndex].text;
+
+  localStorage.setItem("project_key_" + selectionID + "_" + selectionText, projectEncryptionKeyInput.value);
+
+  projectNamesListSelect.remove(projectNamesListSelect.selectedIndex);
+  listSavedProjectsWithKeys();
 }
 
 function addUIFunctions() {
@@ -104,13 +128,120 @@ function addUIFunctions() {
   });
 }
 
+function listSavedProjectsWithKeys() {
+  let items = Object.keys(localStorage);
+  var projectNamesListShareSelect = document.getElementById("projectNamesListShare");
+
+  removeOptions("projectNamesListShare");
+
+  for (let item of items) {
+    if (item !== "private_key") {
+      if (item.startsWith("project_key_")) {
+        var option = document.createElement("option");
+        option.id = item.split("_")[2];
+        option.text = item.split("_")[3];
+        projectNamesListShareSelect.add(option);
+      }
+    }
+  }
+}
+
+function encryptProjectKey() {
+  let publicKeysListSelect = document.getElementById("publicKeysList");
+  let projectNamesListShareSelect = document.getElementById("projectNamesListShare");
+  let shareableProjectKeyTextfield = document.getElementById("shareableProjectKey");
+
+  let selectedRecipientKey = localStorage.getItem(publicKeysListSelect.options[publicKeysListSelect.selectedIndex].text);
+
+  let selectedProjectKey = localStorage.getItem("project_key_" + projectNamesListShareSelect.options[projectNamesListShareSelect.selectedIndex].id + "_" + projectNamesListShareSelect.options[projectNamesListShareSelect.selectedIndex].text);
+
+  let exportedProjectNameAndKey = projectNamesListShareSelect.options[projectNamesListShareSelect.selectedIndex].text + "," + selectedProjectKey;
+
+  var encrypt = new JSEncrypt();
+  encrypt.setPublicKey(selectedRecipientKey);
+
+  shareableProjectKeyTextfield.value = encrypt.encrypt(exportedProjectNameAndKey);
+}
+
+function decryptEncryptionKey() {
+
+}
+
+function decryptProjectNamesImportList() {
+
+}
+
+function importProjectEncryptionKey() {
+
+}
+
 function addEventListeners() {
   document.getElementById("submitPublicKeyButton").addEventListener("click", addPublicKey);
-  document.getElementById("submitPrivateKeyButton").addEventListener("click", addPrivateKey);
+  document.getElementById("generateKeypairButton").addEventListener("click", generateKeypair);
+  document.getElementById("generateProjectEncryptionKeyButton").addEventListener("click", generateProjectEncryptionKey);
+  document.getElementById("projectEncryptionKeyButton").addEventListener("click", saveProjectEncryptionKey);
   document.getElementById("publicKeysList").addEventListener("change", showPublicKeyDetails);
+  document.getElementById("projectNamesListShare").addEventListener("change", encryptProjectKey);
+
+  port = chrome.runtime.connect({name:"port-from-ext"});
+
+  port.onMessage.addListener(function(m) {
+    console.log("In options script, received message from background script:" + m.action);
+    if (m.action === "sendProjectIDsAndNames") {
+      var projectNamesListSelect = document.getElementById("projectNamesList");
+      var projectNamesImportListSelect = document.getElementById("projectNamesImportList");
+
+      removeOptions("projectNamesList");
+      removeOptions("projectNamesListShare");
+      removeOptions("projectNamesImportList");
+
+      console.log(m.data);
+      for (var i in m.data) {
+        if (!localStorage.getItem("project_key_" + m.data[i][0] + "_" + m.data[i][1])) {
+          localStorage.setItem("project_" + m.data[i][0] + "_" + m.data[i][1], "");
+          projectNames.push(m.data[i][1]);
+          var option = document.createElement("option");
+          option.id = m.data[i][0];
+          option.text = m.data[i][1];
+          projectNamesListSelect.add(option);
+
+          option = document.createElement("option");
+          option.id = m.data[i][0];
+          option.text = m.data[i][1];
+          projectNamesImportListSelect.add(option);
+        }
+      }
+
+      listSavedProjectsWithKeys();
+    } else if (m.action === "getProjectKeys") {
+      let items = Object.keys(localStorage);
+      let aes_keys = [];
+
+      for (let item of items) {
+        if (item !== "private_key") {
+          if (item.startsWith("project_key_")) {
+            let entry = [];
+
+            let id = item.split("_")[2];
+            let name = item.split("_")[3];
+            let key = localStorage.getItem(item);
+
+            entry.push(id);
+            entry.push(name);
+            entry.push(key);
+
+            aes_keys.push(entry);
+          }
+        }
+      }
+
+      port.postMessage({action: "getProjectKeysAnswer", data: aes_keys});
+    }
+  });
 }
 
 addEventListeners();
 listPublicKeys();
+listSavedProjectsWithKeys();
 addUIFunctions();
 setTimeout(sendPublicKeys, 5000);

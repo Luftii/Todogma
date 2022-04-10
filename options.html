@@ -1,13 +1,39 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <meta http-equiv="Content-Security-Policy"
+      content="script-src 'self';">
     <link rel="stylesheet" href="dependencies/jquery-ui-1.13.1/jquery-ui.css"/>
     <script src="dependencies/jquery-3.6.0.js"></script>
     <script src="dependencies/jquery-ui-1.13.1/jquery-ui.js"></script>
+    <script src="dependencies/jsencrypt-3.2.1/jsencrypt.min.js"></script>
     <link rel="stylesheet" href="options.css"/>
   </head>
   <body>
     <div id="optionsAccordion">
+      <h1>Add encryption to Todoist project</h1>
+      <div>
+        <table>
+          <tr>
+            <th>Project</th>
+            <th>Encryption key</th>
+          </tr>
+          <tr>
+            <td>
+              <select name="projectNamesList" size="10" id="projectNamesList">
+            </td>
+            <td>
+              <input type="text" size="50" id="projectEncryptionKeyInput"/>
+            </td>
+            <td>
+              <button id="generateProjectEncryptionKeyButton">Generate encryption key</button>
+            </td>
+            <td>
+              <button id="projectEncryptionKeyButton">Save encryption key</button>
+            </td>
+          </tr>
+        </table>
+      </div>
       <h1>Share project encryption key</h1>
       <div>
         <table>
@@ -21,7 +47,7 @@
               <select name="publicKeysList" size="10" id="publicKeysList">
             </td>
             <td>
-              <select name="projectNamesList" size="10" id="projectNamesList">
+              <select name="projectNamesListShare" size="10" id="projectNamesListShare">
             </td>
             <td>
               <textarea rows="10" cols="50" id="shareableProjectKey"></textarea>
@@ -49,17 +75,41 @@
         </table>
       </div>
 
-      <h1>Set the private key</h1>
+      <h1>Import project encryption key</h1>
       <div>
         <table>
           <tr>
-            <td class="section_header">Private key:</td><td><textarea rows="5" cols="60" id="addPrivateKeyInput"></textarea></td>
+            <th>(Encrypted) encryption key</th>
+            <th>Project list</th>
           </tr>
           <tr>
-            <td class="section_header">Private key passphrase (optional):</td><td><input type="text" size="60" id="addPublicKeyIdentifier"/></textarea></td>
+            <td><textarea rows="5" cols="60" id="importProjectEncryptionKeyTextarea"></textarea></td>
+            <td>
+              <div>
+              <select name="projectNamesImportList" size="10" id="projectNamesImportList">
+                &nbsp;<div id="importProjectEncryptionKeyStatusDiv"/>
+              </div>
+            </td>
+            <td><button id="importProjectEncryptionKeyButton">Import project key</button></td>
+          </tr>
+        </table>
+      </div>
+
+      <h1>Generate Keypair</h1>
+      <div>
+        <table>
+          <tr>
+            <div><td><button id="generateKeypairButton">Generate a keypair for use within Todogma (4096 bit)</button>&nbsp;<div id="generateKeypairStatusDiv"/></td></div>
           </tr>
           <tr>
-            <div><td/><td><button id="submitPrivateKeyButton">Save private key</button>&nbsp;<div id="addPrivateKeyStatusDiv"/></td></div>
+            <td>
+              Your public key (also saved in local storage):
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <textarea rows="5" cols="60" id="generatedPublicKeyTextarea"></textarea>
+            </td>
           </tr>
         </table>
       </div>

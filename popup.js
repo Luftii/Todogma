@@ -1,20 +1,43 @@
-function setTaskText() {
-  // This is the task list
-  // document.body.div[1].div.div[2].div[2].main.div.div[2].div.div.ul
+var aes_keys;
 
+function performEncryption() {
+  let projectKeyListSelect = document.getElementById("projectKeyList");
 
+  let selectedKey = localStorage.getItem(projectKeyListSelect.options[projectKeyListSelect.selectedIndex].text);
 
+  var encryption = CryptoJS.AES.encrypt($("#textInput").val(), selectedKey);
+
+  $("#textInput").val(encryption);
 }
 
-function decryptTaskComments() {
-  // console.log("Test");
-  // document.getElementById("comment-3045180690").innerHTML = "Yeaaa boiiiii";
-  // $("#comment-3045180690").closest("div.markdown_content").find("p").innerHTML = "Yeaaaaa boiiiii";
-  // findCommentIDs();
+// Clears the select element on the HTML page
+function removeOptions(selectID) {
+  var selectToClear = document.getElementById(selectID);
+
+  var i, L = selectToClear.options.length - 1;
+   for(i = L; i >= 0; i--) {
+      selectToClear.remove(i);
+   }
 }
 
 function addEventListeners() {
-  document.getElementById("decryptProjectCommentsButton").addEventListener("click", decryptTaskComments);
+  document.getElementById("encryptDecryptButton").addEventListener("click", performEncryption);
+
+  let items = Object.keys(localStorage);
+  var projectKeyListSelect = document.getElementById("projectKeyList");
+
+  removeOptions("projectKeyList");
+
+  for (let item of items) {
+    if (item !== "private_key") {
+      if (item.startsWith("project_key_")) {
+        var option = document.createElement("option");
+        option.id = item.split("_")[2];
+        option.text = item;
+        projectKeyListSelect.add(option);
+      }
+    }
+  }
 }
 
 addEventListeners();
