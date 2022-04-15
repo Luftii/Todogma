@@ -80,7 +80,7 @@ function generateKeypairStatusDivSuccessMessage() {
 }
 
 function generateKeypairStatusDivRemoveSuccessMessage() {
-  document.getElementById("addPrivateKeyStatusDiv").innerHTML = "";
+  document.getElementById("generateKeypairStatusDiv").innerHTML = "";
 }
 
 // sends the public keys to the content script in Todoist
@@ -98,12 +98,15 @@ function sendPublicKeys(){
 }
 
 function generateProjectEncryptionKey() {
+  // Source:
+  // ----------------
   let randomKey = "";
   let chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 
   for (let i = 0; i < 32; i++) {
     randomKey += chars.charAt(Math.floor(Math.random() * chars.length));
   }
+  // ----------------
 
   document.getElementById("projectEncryptionKeyInput").value = randomKey;
 }
@@ -124,7 +127,8 @@ function saveProjectEncryptionKey() {
 
 function addUIFunctions() {
   $("#optionsAccordion").accordion({
-    collapsible: true
+    collapsible: true,
+    heightStyle: "content"
   });
 }
 
@@ -163,16 +167,37 @@ function encryptProjectKey() {
   shareableProjectKeyTextfield.value = encrypt.encrypt(exportedProjectNameAndKey);
 }
 
-function decryptEncryptionKey() {
+function decryptProjectKey() {
+  let private_key = localStorage.getItem("private_key");
+  let importProjecEncryptionKeyTextfield = document.getElementById("importProjectEncryptionKey");
+  let importProjectNameTextfield = document.getElementById("importProjectName");
+  let importProjectEncryptionKeyTextfield = document.getElementById("importProjectEncryptionKeyTextfield");
 
-}
+  console.log("Test");
 
-function decryptProjectNamesImportList() {
+  let decrypt = new JSEncrypt();
+  decrypt.setPrivateKey(private_key);
 
+  let decryptedInput = decrypt.decrypt(importProjectEncryptionKeyTextfield.value);
+
+  importProjectNameTextfield.value = decryptedInput.split(",")[0];
+  importProjecEncryptionKeyTextfield.value = decryptedInput.split(",")[1];
 }
 
 function importProjectEncryptionKey() {
+  let projectNamesImportListSelect = document.getElementById("projectNamesImportList");
+  let importProjectNameTextfield = document.getElementById("importProjectName");
+  let importProjectEncryptionKeyInput = document.getElementById("importProjectEncryptionKey");
 
+  // Get selected option id and name
+  let selectionID = projectNamesImportListSelect.options[projectNamesImportListSelect.selectedIndex].id;
+  let projectName = importProjectNameTextfield.value;
+
+  localStorage.setItem("project_key_" + selectionID + "_" + projectName, importProjectEncryptionKeyInput.value);
+
+  projectNamesImportListSelect.remove(projectNamesImportListSelect.selectedIndex);
+  importProjectEncryptionKeyInput.value = "";
+  listSavedProjectsWithKeys();
 }
 
 function addEventListeners() {
@@ -182,6 +207,8 @@ function addEventListeners() {
   document.getElementById("projectEncryptionKeyButton").addEventListener("click", saveProjectEncryptionKey);
   document.getElementById("publicKeysList").addEventListener("change", showPublicKeyDetails);
   document.getElementById("projectNamesListShare").addEventListener("change", encryptProjectKey);
+  document.getElementById("decryptProjectKeyButton").addEventListener("click", decryptProjectKey);
+  document.getElementById("importProjectEncryptionKeyButton").addEventListener("click", importProjectEncryptionKey);
 
   port = chrome.runtime.connect({name:"port-from-ext"});
 

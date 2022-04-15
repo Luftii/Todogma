@@ -10,6 +10,16 @@ function performEncryption() {
   $("#textInput").val(encryption);
 }
 
+function performDecryption() {
+  let projectKeyListSelect = document.getElementById("projectKeyList");
+
+  let selectedKey = localStorage.getItem(projectKeyListSelect.options[projectKeyListSelect.selectedIndex].text);
+
+  var decryption = CryptoJS.AES.decrypt($("#textInput").val(), selectedKey).toString(CryptoJS.enc.Utf8);
+
+  $("#textInput").val(decryption);
+}
+
 // Clears the select element on the HTML page
 function removeOptions(selectID) {
   var selectToClear = document.getElementById(selectID);
@@ -21,7 +31,8 @@ function removeOptions(selectID) {
 }
 
 function addEventListeners() {
-  document.getElementById("encryptDecryptButton").addEventListener("click", performEncryption);
+  document.getElementById("encryptButton").addEventListener("click", performEncryption);
+  document.getElementById("decryptButton").addEventListener("click", performDecryption);
 
   let items = Object.keys(localStorage);
   var projectKeyListSelect = document.getElementById("projectKeyList");

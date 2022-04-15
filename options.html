@@ -79,11 +79,39 @@
       <div>
         <table>
           <tr>
-            <th>(Encrypted) encryption key</th>
+            <th></th>
             <th>Project list</th>
           </tr>
           <tr>
-            <td><textarea rows="5" cols="60" id="importProjectEncryptionKeyTextarea"></textarea></td>
+            <td>
+              <table>
+                <tr>
+                  <div>
+                    (Encrypted) encryption key
+                  </div>
+                </tr>
+                <tr>
+                  <input type="text" size="60" id="importProjectEncryptionKeyTextfield"></input>&nbsp;
+                  <button id="decryptProjectKeyButton">Decrypt</button>
+                </tr>
+                <tr>
+                  <div>
+                    Project:
+                  </div>
+                </tr>
+                <tr>
+                  <input type="text" disabled size="73" id="importProjectName"></input>
+                </tr>
+                <tr>
+                  <div>
+                    Decrypted project key:
+                  </div>
+                </tr>
+                <tr>
+                  <input type="text" disabled size="73" id="importProjectEncryptionKey"></input>
+                </tr>
+              </table>
+            </td>
             <td>
               <div>
               <select name="projectNamesImportList" size="10" id="projectNamesImportList">
