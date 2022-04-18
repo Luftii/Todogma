@@ -5,6 +5,8 @@ function connected(p) {
   if (p.name === "port-from-cs") {
     portFromCS = p;
 
+    // Source: https://developer.chrome.com/docs/extensions/mv3/messaging/#connect
+    // ----------------
     portFromCS.onMessage.addListener(function(m) {
       console.log(m.action + ": " + m.data);
       if (m.action === "sendProjectIDsAndNames") {
@@ -29,6 +31,10 @@ function connected(p) {
       }
     });
   }
+  // ----------------
 }
 
+// Source: https://developer.chrome.com/docs/extensions/mv3/messaging/#connect
+// ----------------
 chrome.runtime.onConnect.addListener(connected);
+// ----------------

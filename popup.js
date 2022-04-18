@@ -26,10 +26,13 @@ function performDecryption() {
 function removeOptions(selectID) {
   var selectToClear = document.getElementById(selectID);
 
+  // Source: https://stackoverflow.com/questions/3364493/how-do-i-clear-all-options-in-a-dropdown-box
+  // ----------------
   var i, L = selectToClear.options.length - 1;
    for(i = L; i >= 0; i--) {
       selectToClear.remove(i);
    }
+   // ----------------
 }
 
 function addEventListeners() {

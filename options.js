@@ -29,10 +29,13 @@ function showPublicKeyDetails() {
 function removeOptions(selectID) {
   var selectToClear = document.getElementById(selectID);
 
+  // Source: https://stackoverflow.com/questions/3364493/how-do-i-clear-all-options-in-a-dropdown-box
+  // ----------------
   var i, L = selectToClear.options.length - 1;
    for(i = L; i >= 0; i--) {
       selectToClear.remove(i);
    }
+   // ----------------
 }
 
 function addPublicKey() {
@@ -57,6 +60,8 @@ function addPublicKeyRemoveSuccessMessage() {
 }
 
 function generateKeypair() {
+  // Source: https://travistidwell.com/jsencrypt/demo/index.html
+  // ----------------
   var keySize = 4096;
   var crypt = new JSEncrypt({default_key_size: keySize});
 
@@ -65,6 +70,7 @@ function generateKeypair() {
   localStorage.setItem("private_key", crypt.getPrivateKey());
 
   localStorage.setItem("public_key_me", crypt.getPublicKey());
+  // ----------------
 
   document.getElementById("generatedPublicKeyTextarea").value = localStorage.getItem("public_key_me");
 
@@ -158,10 +164,13 @@ function decryptProjectKey() {
   let importProjectNameTextfield = document.getElementById("importProjectName");
   let importProjectEncryptionKeyTextfield = document.getElementById("importProjectEncryptionKeyTextfield");
 
+  // Source: https://github.com/travist/jsencrypt
+  // ----------------
   let decrypt = new JSEncrypt();
   decrypt.setPrivateKey(private_key);
 
   let decryptedInput = decrypt.decrypt(importProjectEncryptionKeyTextfield.value);
+  // ----------------
 
   importProjectNameTextfield.value = decryptedInput.split(",")[0];
   importProjecEncryptionKeyTextfield.value = decryptedInput.split(",")[1];
@@ -193,6 +202,8 @@ function addEventListeners() {
   document.getElementById("decryptProjectKeyButton").addEventListener("click", decryptProjectKey);
   document.getElementById("importProjectEncryptionKeyButton").addEventListener("click", importProjectEncryptionKey);
 
+  // Source: https://developer.chrome.com/docs/extensions/mv3/messaging/#connect
+  // ----------------
   port = chrome.runtime.connect({name:"port-from-ext"});
 
   port.onMessage.addListener(function(m) {
@@ -244,6 +255,7 @@ function addEventListeners() {
       port.postMessage({action: "getProjectKeysAnswer", data: aes_keys});
     }
   });
+  // ----------------
 }
 
 addEventListeners();

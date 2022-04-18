@@ -6,9 +6,12 @@ var aes_keys;
 
 function findCommentIDs() {
   commentIDs = [];
+  // Source: https://stackoverflow.com/questions/1206739/find-all-elements-on-a-page-whose-element-id-contains-a-certain-text-using-jquer
+  // ----------------
   $(".comments_list_container").find('div[id^="comment"]').each(function(index) {
     commentIDs.push($(this).attr("id"));
   });
+  // ----------------
 }
 
 function findProjectNames() {
@@ -39,17 +42,23 @@ function performDecryption(text, key) {
 }
 
 function addEventListeners() {
+  // Source: https://developer.chrome.com/docs/extensions/mv3/messaging/#connect
+  // ----------------
   port = chrome.runtime.connect({name:"port-from-cs"});
 
   port.onMessage.addListener(function(m) {
     if (m.action === "getProjectKeysAnswer") {
       aes_keys = m.data;
 
+      // Source: https://stackoverflow.com/questions/1206739/find-all-elements-on-a-page-whose-element-id-contains-a-certain-text-using-jquer
+      // ----------------
       $(".comments_list_container").find('div[id^="comment"]').each(function(index) {
         $(this).find('p').text(performDecryption($(this).find('p').text(), aes_keys[0][2]));
       });
+      // ----------------
     }
   });
+  // ----------------
 }
 
 function runRegularly() {
