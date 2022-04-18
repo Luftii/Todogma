@@ -5,7 +5,7 @@ function performEncryption() {
 
   let selectedKey = localStorage.getItem(projectKeyListSelect.options[projectKeyListSelect.selectedIndex].text);
 
-  var encryption = CryptoJS.AES.encrypt($("#textInput").val(), selectedKey);
+  var encryption = CryptoJS.AES.encrypt("[ENC]" + $("#textInput").val(), selectedKey);
 
   $("#textInput").val(encryption);
 }
@@ -17,7 +17,9 @@ function performDecryption() {
 
   var decryption = CryptoJS.AES.decrypt($("#textInput").val(), selectedKey).toString(CryptoJS.enc.Utf8);
 
-  $("#textInput").val(decryption);
+  if (decryption.startsWith("[ENC]")) {
+    $("#textInput").val(decryption.split("]")[1]);
+  }
 }
 
 // Clears the select element on the HTML page
@@ -40,13 +42,11 @@ function addEventListeners() {
   removeOptions("projectKeyList");
 
   for (let item of items) {
-    if (item !== "private_key") {
-      if (item.startsWith("project_key_")) {
-        var option = document.createElement("option");
-        option.id = item.split("_")[2];
-        option.text = item;
-        projectKeyListSelect.add(option);
-      }
+    if (item.startsWith("project_key_")) {
+      var option = document.createElement("option");
+      option.id = item.split("_")[2];
+      option.text = item;
+      projectKeyListSelect.add(option);
     }
   }
 }

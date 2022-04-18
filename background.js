@@ -2,10 +2,6 @@ let portFromCS;
 let portFromExt;
 
 function connected(p) {
-  portFromCS = p;
-
-  console.log("Port name: " + p.name);
-
   if (p.name === "port-from-cs") {
     portFromCS = p;
 

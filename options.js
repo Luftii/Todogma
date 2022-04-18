@@ -38,11 +38,9 @@ function removeOptions(selectID) {
 function addPublicKey() {
   var identifier = "public_key_" + document.getElementById("addPublicKeyIdentifier").value;
   var publicKey = document.getElementById("addPublicKeyInput").value;
-  console.log("Hello is me lufti.");
 
   localStorage.setItem(identifier, publicKey);
 
-  console.log("Public key saved!" + identifier + " " + publicKey);
   addPublicKeyDisplaySuccessMessage();
   listPublicKeys();
   document.getElementById("addPublicKeyIdentifier").value = "";
@@ -83,27 +81,14 @@ function generateKeypairStatusDivRemoveSuccessMessage() {
   document.getElementById("generateKeypairStatusDiv").innerHTML = "";
 }
 
-// sends the public keys to the content script in Todoist
-function sendPublicKeys(){
-  let keys = Object.keys(localStorage);
-  var publicKeys = [];
-
-  for (let key of keys) {
-    if (key !== "private_key") {
-      publicKeys.push(key);
-    }
-  }
-
-  console.log("Sending public keys now!");
-}
-
 function generateProjectEncryptionKey() {
-  // Source:
+  // Source: https://attacomsian.com/blog/javascript-generate-random-string#generate-large-random-strings
   // ----------------
+  let length = 32;
   let randomKey = "";
   let chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 
-  for (let i = 0; i < 32; i++) {
+  for (let i = 0; i < length; i++) {
     randomKey += chars.charAt(Math.floor(Math.random() * chars.length));
   }
   // ----------------
@@ -173,8 +158,6 @@ function decryptProjectKey() {
   let importProjectNameTextfield = document.getElementById("importProjectName");
   let importProjectEncryptionKeyTextfield = document.getElementById("importProjectEncryptionKeyTextfield");
 
-  console.log("Test");
-
   let decrypt = new JSEncrypt();
   decrypt.setPrivateKey(private_key);
 
@@ -213,7 +196,6 @@ function addEventListeners() {
   port = chrome.runtime.connect({name:"port-from-ext"});
 
   port.onMessage.addListener(function(m) {
-    console.log("In options script, received message from background script:" + m.action);
     if (m.action === "sendProjectIDsAndNames") {
       var projectNamesListSelect = document.getElementById("projectNamesList");
       var projectNamesImportListSelect = document.getElementById("projectNamesImportList");
@@ -222,7 +204,6 @@ function addEventListeners() {
       removeOptions("projectNamesListShare");
       removeOptions("projectNamesImportList");
 
-      console.log(m.data);
       for (var i in m.data) {
         if (!localStorage.getItem("project_key_" + m.data[i][0] + "_" + m.data[i][1])) {
           localStorage.setItem("project_" + m.data[i][0] + "_" + m.data[i][1], "");
@@ -245,20 +226,18 @@ function addEventListeners() {
       let aes_keys = [];
 
       for (let item of items) {
-        if (item !== "private_key") {
-          if (item.startsWith("project_key_")) {
-            let entry = [];
+        if (item.startsWith("project_key_")) {
+          let entry = [];
 
-            let id = item.split("_")[2];
-            let name = item.split("_")[3];
-            let key = localStorage.getItem(item);
+          let id = item.split("_")[2];
+          let name = item.split("_")[3];
+          let key = localStorage.getItem(item);
 
-            entry.push(id);
-            entry.push(name);
-            entry.push(key);
+          entry.push(id);
+          entry.push(name);
+          entry.push(key);
 
-            aes_keys.push(entry);
-          }
+          aes_keys.push(entry);
         }
       }
 
@@ -271,4 +250,3 @@ addEventListeners();
 listPublicKeys();
 listSavedProjectsWithKeys();
 addUIFunctions();
-setTimeout(sendPublicKeys, 5000);

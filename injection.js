@@ -1,5 +1,4 @@
-console.log("Injected script is running!");
-var projectIDsAndNames = [];
+console.log("[TODOGMA] Injected script is running!");
 var commentIDs = [];
 var publicKeys = [];
 var port;
@@ -8,14 +7,8 @@ var aes_keys;
 function findCommentIDs() {
   commentIDs = [];
   $(".comments_list_container").find('div[id^="comment"]').each(function(index) {
-  	// console.log($(this).attr("id"));
     commentIDs.push($(this).attr("id"));
   });
-
-  console.log("IDs are:");
-  for (var i = 0; i < commentIDs.length; i++) {
-  	console.log(i + ": " + commentIDs[i]);
-  }
 }
 
 function findProjectNames() {
@@ -29,8 +22,6 @@ function findProjectNames() {
   });
 
   port.postMessage({action: "sendProjectIDsAndNames", data: projectNames});
-
-  console.log(projectNames);
 }
 
 function getProjectKeys() {
@@ -38,19 +29,23 @@ function getProjectKeys() {
 }
 
 function performDecryption(text, key) {
-  return "[DEC] " + CryptoJS.AES.decrypt(text, key).toString(CryptoJS.enc.Utf8);
+  let decryptedInput =  CryptoJS.AES.decrypt(text, key).toString(CryptoJS.enc.Utf8);
+
+  if (decryptedInput.startsWith("[ENC]")) {
+    return "[DEC] " + decryptedInput.split("]")[1];
+  } else {
+    return text;
+  }
 }
 
 function addEventListeners() {
   port = chrome.runtime.connect({name:"port-from-cs"});
 
   port.onMessage.addListener(function(m) {
-    console.log(m.action + ": " + m.data);
     if (m.action === "getProjectKeysAnswer") {
       aes_keys = m.data;
 
       $(".comments_list_container").find('div[id^="comment"]').each(function(index) {
-      	console.log($(this).attr("id"));
         $(this).find('p').text(performDecryption($(this).find('p').text(), aes_keys[0][2]));
       });
     }
